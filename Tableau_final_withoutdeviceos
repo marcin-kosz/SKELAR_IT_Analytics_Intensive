@@ -1,0 +1,31 @@
+CREATE OR REPLACE TABLE `tableau-496709.Tableau.final_marketing_dataset` AS
+
+SELECT
+
+    s.date,
+    s.channel,
+    s.geo,
+
+    s.spend,
+
+    COALESCE(u.users, 0) AS users,
+    COALESCE(u.payers, 0) AS payers,
+
+    COALESCE(u.revenue_7d, 0) AS revenue_7d,
+    COALESCE(u.revenue_90d, 0) AS revenue_90d,
+
+    SAFE_DIVIDE(u.revenue_7d, s.spend) AS roas,
+
+    SAFE_DIVIDE(s.spend, u.payers) AS cpa,
+
+    SAFE_DIVIDE(u.payers, u.users) AS conversion_rate,
+
+    SAFE_DIVIDE(s.spend, u.users) AS cost_per_user
+
+FROM `tableau-496709.Tableau.Tableau` s
+
+LEFT JOIN `tableau-496709.Tableau.users_agg` u
+
+ON s.date = u.date
+AND s.channel = u.channel
+AND s.geo = u.geo
